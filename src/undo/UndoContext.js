@@ -9,6 +9,8 @@ export const UndoCtx = React.createContext({});
 export const UndoContext = ({children}) => {
   const [undoQueue, setUndoQueue] = useState([]);
   const [redoQueue, setRedoQueue] = useState([]);
+  let multi = null;
+
   const value = {
 
     /**
@@ -17,17 +19,22 @@ export const UndoContext = ({children}) => {
      */
     execute: (ops) => {
       ops.do();
-      setUndoQueue([ops, ...undoQueue]);
+      if(multi) {
+        multi.unshift(ops)
+        // setUndoQueue([ops, ...undoQueue[0]], undoQueue.splice(1))
+      } else {
+        setUndoQueue([[ops], ...undoQueue]);
+      }
     },
 
     /**
      * Pick next operation from the undo queue, call the .undo() function and move the operation to redo queue.
      */
     undo: () => {
-      const ops = undoQueue[0];
-      ops.undo();
+      const opss = undoQueue[0];
+      opss.forEach(ops => ops.undo());
 
-      setRedoQueue([ops, ...redoQueue])
+      setRedoQueue([opss, ...redoQueue])
       setUndoQueue(undoQueue.slice(1));
     },
 
@@ -35,9 +42,9 @@ export const UndoContext = ({children}) => {
      * Pick next operation from the redo queue, call the .do() function and move the operation to undo queue.
      */
     redo: () => {
-      const ops = redoQueue[0];
-      ops.do();
-      setUndoQueue([ops, ...undoQueue])
+      const opss = redoQueue[0];
+      opss.reverse().forEach(ops => ops.do());
+      setUndoQueue([opss, ...undoQueue])
       setRedoQueue(redoQueue.slice(1));
     },
 
@@ -60,14 +67,21 @@ export const UndoContext = ({children}) => {
     isRedoable: redoQueue.length,
 
     /**
-     * Not implemented yet: Allow multiple operations to be done/undone as one block.
+     * Opens a grouping of a number of operations into one undo.
+     *
+     * Warning: Calling consecutive operations must not be done asynchronously or this will break
      */
-    open: () => console.log("Open undo"),
+    openMulti: () => {
+      multi = [];
+    },
 
     /**
-     * Not implemented yet: Allow multiple operations to be done/undone as one block.
+     * Closes the grouping.
      */
-    close: () => console.log("Close undo"),
+    closeMulti: () => {
+      setUndoQueue([multi, ...undoQueue]);
+      multi = null;
+    },
   };
   return <UndoCtx.Provider value={value}>{children}</UndoCtx.Provider>;
 };

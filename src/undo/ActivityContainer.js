@@ -6,7 +6,7 @@ export const ActivityContainer = ({activities, participants, assignParticipant})
 
   const [selectedActivity, setSelectedActivity] = useState(activities[0]);
   const [selectedSegment, setSelectedSegment] = useState(activities[0].segments[0]);
-  const {undo, redo, isUndoable, isRedoable} = useContext(UndoCtx);
+  const {undo, redo, isUndoable, isRedoable, openMulti, closeMulti} = useContext(UndoCtx);
 
   const segMap = new Map();
   participants.forEach(participant =>
@@ -36,7 +36,20 @@ export const ActivityContainer = ({activities, participants, assignParticipant})
       <List celled>
         {selectedActivity.segments.map(s =>
           <List.Item key={s.id}>
-            <List.Header onClick={() => setSelectedSegment(s)}>{s.name}<Icon name="target" disabled={selectedSegment.id !== s.id}/></List.Header>
+            <List.Header>
+              <span onClick={() => setSelectedSegment(s)}>{s.name}<Icon name="target" disabled={selectedSegment.id !== s.id}/></span>
+              {segMap.has(s.id) &&
+              <Button onClick={() => {
+                openMulti();
+                Array.from(segMap.get(s.id)).forEach(participant => {
+                    assignParticipant({participantId: participant.id, fromSegmentId: s.id, toSegmentId: selectedSegment.id});
+                  }
+                );
+                closeMulti();
+
+              }} disabled={selectedSegment.id === s.id}>Move all</Button>
+              }
+            </List.Header>
             <List>
               {segMap.has(s.id)
                 ?
