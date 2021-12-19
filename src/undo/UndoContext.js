@@ -5,8 +5,6 @@ export const UndoCtx = React.createContext({});
 /**
  * This context implements undo/redo queue.
  *
- * Use the
- *
  */
 export const UndoContext = ({children}) => {
   const [undoQueue, setUndoQueue] = useState([]);
@@ -18,7 +16,6 @@ export const UndoContext = ({children}) => {
      * @param ops with do and undo functions.
      */
     execute: (ops) => {
-      console.log("Do!");
       ops.do();
       setUndoQueue([ops, ...undoQueue]);
     },
@@ -29,7 +26,6 @@ export const UndoContext = ({children}) => {
     undo: () => {
       const ops = undoQueue[0];
       ops.undo();
-      console.log("Undo! Ops = ", ops);
 
       setRedoQueue([ops, ...redoQueue])
       setUndoQueue(undoQueue.slice(1));
@@ -39,7 +35,6 @@ export const UndoContext = ({children}) => {
      * Pick next operation from the redo queue, call the .do() function and move the operation to undo queue.
      */
     redo: () => {
-      console.log("Redo!");
       const ops = redoQueue[0];
       ops.do();
       setUndoQueue([ops, ...undoQueue])
