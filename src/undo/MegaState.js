@@ -1,6 +1,7 @@
 import React, {useContext, useReducer} from 'react';
 import {ActivityContainer} from "./ActivityContainer";
 import {UndoCtx} from "./UndoContext";
+import {ActivityRouter} from "./ActivityRouter";
 
 export const MegaState = () => {
   const [state, dispatch] = useReducer(reducer, {
@@ -82,7 +83,7 @@ export const MegaState = () => {
   }
 
   return (
-    <ActivityContainer
+    <ActivityRouter
       activities={state.activities}
       participants={state.participants}
       assignParticipant={({participantId, fromSegmentId, toSegmentId}) =>

@@ -1,19 +1,25 @@
 import React, {useContext, useState} from "react";
 import {Button, Icon, List, Menu} from "semantic-ui-react";
 import {UndoCtx} from "./UndoContext";
+import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export const ActivityContainer = ({activities, participants, assignParticipant}) => {
+  const navigate = useNavigate();
 
-  const [selectedActivity, setSelectedActivity] = useState(activities[0]);
-  const [selectedSegment, setSelectedSegment] = useState(activities[0].segments[0]);
+  // const [selectedActivity, setSelectedActivity] = useState(activities[0]);
+  // const [selectedSegment, setSelectedSegment] = useState(activities[0].segments[0]);
   const {undo, redo, isUndoable, isRedoable, openMulti, closeMulti} = useContext(UndoCtx);
+
+  const {activityId, segmentId} = useParams();
+  const selectedActivity = activityId ? activities.find(a => a.id === activityId): activities[0];
+  const selectedSegment = segmentId ? selectedActivity.segments.find(s => s.id === segmentId): selectedActivity.segments[0];
 
   const segMap = new Map();
   participants.forEach(participant =>
     participant.segments.forEach(segment =>
       segMap.has(segment) ? segMap.get(segment).add(participant) : segMap.set(segment, new Set().add(participant))));
 
-  console.log("Segmap = ", segMap);
   return (
     <div>
       <List horizontal>
@@ -24,8 +30,11 @@ export const ActivityContainer = ({activities, participants, assignParticipant})
       <Menu attached='top' tabular>
         {activities.map((a) =>
           <Menu.Item key={a.id} onClick={() => {
-            setSelectedActivity(a);
-            setSelectedSegment(a.segments[0]);
+            // setSelectedActivity(a);
+            navigate(`/activity/${a.id}`);
+
+            // setSelectedSegment(a.segments[0]);
+
           }} active={a.id === selectedActivity.id}>
             {a.title}
           </Menu.Item>
@@ -37,7 +46,7 @@ export const ActivityContainer = ({activities, participants, assignParticipant})
         {selectedActivity.segments.map(s =>
           <List.Item key={s.id}>
             <List.Header>
-              <span onClick={() => setSelectedSegment(s)}>{s.name}<Icon name="target" disabled={selectedSegment.id !== s.id}/></span>
+              <span onClick={() => navigate(`/activity/${selectedActivity.id}/${s.id}`)}>{s.name}<Icon name="target" disabled={selectedSegment.id !== s.id}/></span>
               {segMap.has(s.id) &&
               <Button onClick={() => {
                 openMulti();
