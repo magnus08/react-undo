@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {useNavigate} from "react-router-dom";
 
 export const UndoCtx = React.createContext({});
 
@@ -10,6 +11,13 @@ export const UndoContext = ({children}) => {
   const [undoQueue, setUndoQueue] = useState([]);
   const [redoQueue, setRedoQueue] = useState([]);
   let multi = null;
+  const navigate = useNavigate();
+
+  function nav(ops) {
+    if (ops.path) {
+      navigate(ops.path);
+    }
+  }
 
   const value = {
 
@@ -32,7 +40,7 @@ export const UndoContext = ({children}) => {
      */
     undo: () => {
       const opss = undoQueue[0];
-      opss.forEach(ops => ops.undo());
+      opss.forEach(ops => {ops.undo(); nav(ops)});
 
       setRedoQueue([opss, ...redoQueue])
       setUndoQueue(undoQueue.slice(1));
@@ -43,7 +51,7 @@ export const UndoContext = ({children}) => {
      */
     redo: () => {
       const opss = redoQueue[0];
-      opss.reverse().forEach(ops => ops.do());
+      opss.reverse().forEach(ops => {ops.do(); nav(ops)});
       setUndoQueue([opss, ...undoQueue])
       setRedoQueue(redoQueue.slice(1));
     },

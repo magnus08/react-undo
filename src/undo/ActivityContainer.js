@@ -1,8 +1,7 @@
 import React, {useContext, useState} from "react";
 import {Button, Icon, List, Menu} from "semantic-ui-react";
 import {UndoCtx} from "./UndoContext";
-import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 export const ActivityContainer = ({activities, participants, assignParticipant}) => {
   const navigate = useNavigate();
@@ -10,7 +9,6 @@ export const ActivityContainer = ({activities, participants, assignParticipant})
   // const [selectedActivity, setSelectedActivity] = useState(activities[0]);
   // const [selectedSegment, setSelectedSegment] = useState(activities[0].segments[0]);
   const {undo, redo, isUndoable, isRedoable, openMulti, closeMulti} = useContext(UndoCtx);
-
   const {activityId, segmentId} = useParams();
   const selectedActivity = activityId ? activities.find(a => a.id === activityId): activities[0];
   const selectedSegment = segmentId ? selectedActivity.segments.find(s => s.id === segmentId): selectedActivity.segments[0];

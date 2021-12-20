@@ -1,11 +1,9 @@
-import {MegaState} from './undo/MegaState';
 import {UndoContext} from "./undo/UndoContext";
+import {MainRouter} from "./MainRouter";
 
 function App() {
   return (
-    <UndoContext>
-      <MegaState/>
-    </UndoContext>
+      <MainRouter/>
   );
 }
 

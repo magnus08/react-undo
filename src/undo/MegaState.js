@@ -1,7 +1,7 @@
 import React, {useContext, useReducer} from 'react';
-import {ActivityContainer} from "./ActivityContainer";
 import {UndoCtx} from "./UndoContext";
 import {ActivityRouter} from "./ActivityRouter";
+import {useLocation} from "react-router-dom";
 
 export const MegaState = () => {
   const [state, dispatch] = useReducer(reducer, {
@@ -38,7 +38,8 @@ export const MegaState = () => {
   });
 
   const {execute} = useContext(UndoCtx);
-
+  const location = useLocation();
+  console.log("Location = ", location);
   function assignParticipant(participants, participantId, fromSegmentId, toSegmentId) {
     console.log("+++ init: ", participantId, fromSegmentId, toSegmentId);
 
@@ -69,7 +70,6 @@ export const MegaState = () => {
 
   function reducer(state, action) {
     let newState;
-    console.log("reducer here: ", action);
     switch (action.type) {
       case 'ASSIGN_PARTICIPANT': {
         const {participantId, fromSegmentId, toSegmentId} = action;
@@ -104,7 +104,8 @@ export const MegaState = () => {
                 fromSegmentId: toSegmentId,
                 toSegmentId: fromSegmentId,
               })
-            }
+            },
+            path: location.pathname,
           }
 
         )}
