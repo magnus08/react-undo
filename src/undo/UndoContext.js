@@ -33,6 +33,7 @@ export const UndoContext = ({children}) => {
       } else {
         setUndoQueue([[ops], ...undoQueue]);
       }
+      setRedoQueue([])
     },
 
     /**
